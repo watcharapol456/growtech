@@ -1,0 +1,1 @@
+ALTER TABLE "userreport" ADD COLUMN "name" text NOT NULL;

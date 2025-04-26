@@ -1,0 +1,1 @@
+ALTER TABLE "userreport" DROP COLUMN "name";

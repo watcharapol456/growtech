@@ -1,0 +1,1 @@
+ALTER TABLE "username" ADD COLUMN "role" "role" DEFAULT 'user' NOT NULL;
