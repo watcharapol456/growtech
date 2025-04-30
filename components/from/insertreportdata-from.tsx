@@ -6,11 +6,13 @@ import { insertReportdata } from "@/actions";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { Label } from "../ui/label";
+import { useRouter } from "next/navigation";
 
 export default function ReportForm() {
   const [description, setDescription] = useState<string>("");
   const [topic, setTopic] = useState<string>("");
   const [name, setName] = useState<string>("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +35,9 @@ export default function ReportForm() {
       console.error("Error saving data:", error);
       toast.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
-
+  };
+  const cancel = () => {
+    router.push("/dashboard");
   };
 
   return (
@@ -54,8 +58,11 @@ export default function ReportForm() {
           placeholder="Enter details"
           className="m-5 w-[400px]"
         />
-        <div className=" w-full flex justify-center justify-items-center">
-          <Button type="submit">Save</Button>
+        <div className=" w-full flex justify-center justify-items-center gap-5">
+          <Button type="submit" className="bg-emerald-400">
+            Save
+          </Button>
+          <Button className="bg-red-400" onClick={cancel} type="button">Cancel</Button>
         </div>
       </form>
     </div>

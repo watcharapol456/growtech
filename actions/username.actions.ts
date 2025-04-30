@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 interface editUser {
   name: string;
   username: string;
-  role: string;
+  password:string;
 }
 
 export async function editUser(updateUser: editUser, id: string) {
@@ -17,6 +17,7 @@ export async function editUser(updateUser: editUser, id: string) {
       .set({
         username: updateUser.username,
         name: updateUser.name,
+        password:updateUser.password,
       })
       .where(eq(users.id, id)); 
 

@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,11 +9,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DeleteButton from "@/components/uicustom/del-user-components";
-// import DeleteButton from "@/components/user/del-user-components";
+import Loading from "@/components/uicustom/loading";
 import { useCurrentUser } from "@/hook/useCurrentUser";
-import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -26,6 +25,8 @@ interface User {
 export default function MemberPage() {
   const [users, setUsers] = useState<User[]>([]);
   const router = useRouter(); 
+  const user = useCurrentUser(); 
+
   async function fetchUser() {
     try {
       const res = await fetch("/api/user");
@@ -41,21 +42,30 @@ export default function MemberPage() {
       console.error(error);
     }
   }
+
   const refresh = () =>{
     router.refresh();
   }
 
+
+  useEffect(() => {
+    if (user?.role === "user") {
+      redirect("/dashboard"); 
+    }
+  }, [user]); 
+
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, []); 
 
-  
-
-  console.log("DEBUG users", users);
-  const user = useCurrentUser();
-  if (user?.role === "user") {
-    return redirect("/dashboard");
+  if(users.length === 0){
+    return(
+      <div className="w-full h-full">
+        <Loading/>
+      </div>
+    )
   }
+
   return (
     <div className="relative w-full h-full">
       <div className="absolute top-0 right-0 mt-5 mr-5">
@@ -92,8 +102,7 @@ export default function MemberPage() {
                       </div>
 
                       <div onClick={refresh}>
-                      <DeleteButton userId={user.id} onDeleted={fetchUser} />
-
+                        <DeleteButton userId={user.id} onDeleted={fetchUser} />
                       </div>
                     </div>
                   </TableCell>

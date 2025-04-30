@@ -1,83 +1,108 @@
-// "use client";
+"use client";
 
-// import { DatePicker } from "@/components/ui/DatePicker";
-// import { useCurrentUser } from "@/hook/useCurrentUser";
-// import { redirect } from "next/navigation";
+import { useCurrentUser } from "@/hook/useCurrentUser";
+import { redirect } from "next/navigation";
+import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-// import { Button } from "@/components/ui/button";
-// import { useState, useTransition } from "react";
-// import { getReportsByDate } from "@/actions/date.action";
+type RawItem = {
+  timestamp: string;
+  temp1: number;
+  humi1: number;
+  avgSoil: number;
+  eData: number;
+};
 
+type DisplayItem = {
+  title: string;
+  date: string;
+};
 
-// interface Reports {
-//   time: Date; 
-//   temperature: number;
-//   humidity: number;
-//   soil: number;
-// }
+export default function DateFilter() {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [allData, setAllData] = useState<RawItem[]>([]);
+  const [filteredData, setFilteredData] = useState<DisplayItem[]>([]);
+   const user = useCurrentUser();
 
-// export default function ReportPage() {
-//   const user = useCurrentUser();
-//   const [data, setData] = useState<Reports[]>([]); 
-//   const [isPending, startTransition] = useTransition();
- 
-//   if (user?.role === "user") {
-//     redirect("/dashboard");
-//   }
+  // ดึงข้อมูลทั้งหมด
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/datareport");
+      const result = await res.json();
+      setAllData(result);
+    };
+    fetchData();
+  }, []);
 
-//   const handleSubmit = async (formData: FormData) => {
-//     startTransition(async () => {
-//       const reports = await getReportsByDate(formData); 
-//       setData(reports);
-//       console.log("DEBUG reports",reports)
-//     });
-//   };
+  // กรองข้อมูลตามวันที่ที่เลือก
+  useEffect(() => {
+    if (!selectedDate || allData.length === 0) return;
 
-//   return (
-//     <div className="w-full h-full">
-//       <div className="border-b-4 p-5 m-5">
-//         <h1 className="text-4xl font-bold">Report</h1>
-//       </div>
-//       <div className="flex">
-//         <div className="flex flex-col items-center justify-center w-full">
-//           <div className="flex flex-1 h-full items-end">
-//             <h1 className="text-4xl font-bold">Dataset</h1>
-//           </div>
-//           <form action={handleSubmit}>
-//             <DatePicker />
-//             <Button disabled={isPending}>{isPending ? "Loading..." : "Submit"}</Button>
-//           </form>
-//         </div>
-//         <div className="flex flex-col items-center w-full p-4 border border-gray-300 rounded-lg m-5">
-//           <h2 className="text-2xl font-semibold mb-2">Area Show Data</h2>
-//           {isPending ? (
-//             <p>Loading...</p>
-//           ) : data.length > 0 ? (
-//             <ul className="w-full">
-//               {data.map((item) => (
-//                 <li key={item.time.toString()} className="border-b p-2">
-              
-    
-//                   <p><strong>Temperature:</strong> {item.temperature}°C</p>
-//                   <p><strong>Humidity:</strong> {item.humidity}%</p>
-//                   <p><strong>Soil:</strong> {item.soil}</p>
-//                 </li>
-//               ))}
-//             </ul>
-//           ) : (
-//             <p>No data available</p>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
+    const selectedDay = selectedDate.getDate();
+    const selectedMonth = selectedDate.getMonth();
+    const selectedYear = selectedDate.getFullYear();
 
-const Page = () =>{
+    const filtered = allData
+      .filter((item) => {
+        const itemDate = new Date(item.timestamp);
+        return (
+          itemDate.getDate() === selectedDay &&
+          itemDate.getMonth() === selectedMonth &&
+          itemDate.getFullYear() === selectedYear
+        );
+      })
+      .map((item) => ({
+        title: `อุณหภูมิ: ${item.temp1}°C, ความชื้น: ${item.humi1}%, ความชื้นดิน: ${item.avgSoil}%`,
+        date: item.timestamp,
+      }));
+
+    setFilteredData(filtered);
+  }, [selectedDate, allData]);
+
+    if (user?.role === "user") {
+      return redirect("/dashboard");
+    }
+  
+
+  
   return (
-    <div>
-      Page
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md">
+      <h1 className="text-2xl font-bold text-center mb-4 text-gray-800">
+        เลือกวันที่เพื่อดูข้อมูล
+      </h1>
+  
+      <div className="flex justify-center mb-6">
+        <DatePicker
+          selected={selectedDate}
+          onChange={(date: Date | null) => setSelectedDate(date)}
+          dateFormat="yyyy-MM-dd"
+          className="border border-gray-300 rounded px-3 py-2 text-gray-700"
+        />
+      </div>
+  
+      <div className="bg-gray-100 p-4 rounded-lg">
+        <h2 className="font-semibold text-lg text-gray-700 mb-3">
+          ข้อมูลวันที่: <span className="text-blue-600">{selectedDate?.toLocaleDateString()}</span>
+        </h2>
+  
+        {filteredData.length === 0 ? (
+          <p className="text-red-500">ไม่พบข้อมูลในวันนี้</p>
+        ) : (
+          <ul className="space-y-3">
+            {filteredData.map((item, idx) => (
+              <li
+                key={idx}
+                className="p-3 bg-white rounded shadow text-gray-800 border-l-4 border-blue-500"
+              >
+                <p className="text-sm text-gray-500">{item.date}</p>
+                <p>{item.title}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
+  
 }
-export default Page;

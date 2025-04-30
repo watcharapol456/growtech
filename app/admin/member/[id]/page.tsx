@@ -11,13 +11,13 @@ import { useEffect, useState } from "react";
 interface UserData {
   name: string;
   username: string;
-  role: string;
+  password: string;
 }
 
 const DEFAULT_FORM_DATA: UserData = {
   name: "",
   username: "",
-  role: "",
+  password: "",
 };
 
 const Page = () => {
@@ -33,7 +33,7 @@ const Page = () => {
       setFormData({
         name: user?.name || "",
         username: user?.username || "",
-        role: user?.role || "",
+        password: user?.password || "",
       });
     } catch (error) {
       console.log(error);
@@ -62,7 +62,7 @@ const Page = () => {
         await editUser({
           name: formData.name,
           username: formData.username,
-          role: formData.role,
+          password: formData.password,
         }, id);
         router.push("/admin/member");  
       }
@@ -81,44 +81,68 @@ const Page = () => {
       router.push("/admin/member");  
     }
 
-  return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <Label>Name</Label>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+    return (
+      <div className="flex items-center justify-center w-full h-full bg-gray-50">
+        <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-lg">
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Edit User</h2>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <Label htmlFor="name" className="text-gray-700">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="username" className="text-gray-700">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="password" className="text-gray-700">Password</Label>
+              <Input
+                id="password"
+                type="text"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="mt-2"
+              />
+            </div>
+            <div className="flex justify-end gap-4 pt-4">
+              <Button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg"
+              >
+                Save Changes
+              </Button>
+              <Button
+                type="button"
+                onClick={cancel}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-6 py-2 rounded-lg"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
         </div>
-        <div>
-          <Label>Username</Label>
-          <Input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label>Role</Label>
-          <Input
-            type="text"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <Button type="submit" className="bg-emerald-400 text-xl">Submit</Button>
-        <Button onClick={cancel} className="bg-red-400 text-xl">Cancel</Button>
-      </form>
-    </div>
-  );
+      </div>
+    );
+    
+    
 };
 
 export default Page;

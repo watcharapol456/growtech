@@ -19,7 +19,7 @@ export const Sidebar_Menu = [
         label : "Camera Feed"
     },
     {
-        imgURL : "/assets/cctv.svg",
+        imgURL : "/assets/clipboard-plus.svg",
         route : "/userreport",
         label : "User report"
     },
@@ -48,7 +48,7 @@ export const Sidebar_Menu_Admin = [
         label : "Report"
     },
     {
-        imgURL : "/assets/user.svg",
+        imgURL : "/assets/clipboard-plus.svg",
         route : "/admin/userreport",
         label : "User report"
     },
